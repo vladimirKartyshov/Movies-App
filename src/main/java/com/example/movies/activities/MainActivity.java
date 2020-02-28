@@ -17,6 +17,7 @@ import com.example.movies.data.MovieAdapter;
 import com.example.movies.model.Movie;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -51,7 +52,30 @@ public class MainActivity extends AppCompatActivity {
                 url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                JSONArray jsonArray = response.getJSONArray("Search");
+                try {
+                    JSONArray jsonArray = response.getJSONArray("Search");
+
+                    for (int i=0; i<jsonArray.length(); i++){
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        String title = jsonObject.getString("Title");
+                        String year = jsonObject.getString("Year");
+                        String posterUrl = jsonObject.getString("Poster");
+
+                        Movie movie = new Movie();
+                        movie.setTitle(title);
+                        movie.setYear(year);
+                        movie.setPosterUrl(posterUrl);
+
+                        movies.add(movie);
+                    }
+
+                    movieAdapter = new MovieAdapter(MainActivity.this,movies);
+                    recyclerView.setAdapter(movieAdapter);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -60,13 +84,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
-
-
+        requestQueue.add(request);
 
     }
 
